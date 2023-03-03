@@ -70,4 +70,17 @@ push:
   rules:
     # Only run the job for the main branch
     - if: '$CI_COMMIT_BRANCH == "main"'
+      # Exclude the before_script section for the push job
+    - when: never
+      changes:
+        - README.md
+        - "*.md"
+        - "docs/**"
+        - "tests/**"
+        - "*.py"
+        - "*.yml"
+        - "*.yaml"
+        - "*.json"
+        - "*.ini"
+        - "*.cfg"
 
