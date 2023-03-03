@@ -55,7 +55,7 @@ push:
     - apk update && apk add git
     - git config --global user.email "alfibalint@gmail.com"
     - git config --global user.name "Balint Alfoldy"
-    - git remote add origin https://github.com/balintalfoldy/ddc-cicd.git
+    - git remote set-url origin https://github.com/balintalfoldy/ddc-cicd.git
     - git branch -M main
     - git push -u origin main
   rules:
