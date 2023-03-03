@@ -56,7 +56,6 @@ push:
     - git config --global user.email "alfibalint@gmail.com"
     - git config --global user.name "Balint Alfoldy"
     - git remote set-url origin https://github.com/balintalfoldy/ddc-cicd.git
-    - git branch -M main
     - git push -u origin main
   rules:
     # Only run the job for the main branch
