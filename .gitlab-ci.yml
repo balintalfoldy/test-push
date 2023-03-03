@@ -1,0 +1,47 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+# Define the job that runs pylint and enforces a minimum rating
+lint:
+  stage: lint
+  image: python:3.8
+  script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - pip install pylint
+    - pylint --fail-under=7.0 coffee
+  allow_failure: false
+
+# Define the job that runs tests
+test:
+  stage: test
+  image: python:3.8
+  script:
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    - python -m pytest
+
+# Define the job that builds the Python package
+build:
+  stage: build
+  image: python:3.8
+  script:
+    - pip install --upgrade pip
+    - pip install --upgrade build
+    - pip install -r requirements.txt
+    - python -m build
+
+# Define the job that pushes the code to a public repository such as GitHub
+push:
+  stage: deploy
+  image: alpine/git
+  script:
+    - git config --global user.email "alfibalint@gmail.com"
+    - git config --global user.name "Balint Alfoldy"
+    - git remote set-url --push origin https://github.com/balintalfoldy/ddc-cicd.git
+    - git push origin main
+  only:
+    - main
