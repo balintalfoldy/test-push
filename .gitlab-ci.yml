@@ -1,3 +1,21 @@
+image: python:3.8
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V
+  - pip install --upgrade pip
+  - pip install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip install -r requirements.txt
+
 stages:
   - lint
   - test
@@ -7,10 +25,7 @@ stages:
 # Define the job that runs pylint and enforces a minimum rating
 lint:
   stage: lint
-  image: python:3.8
   script:
-    - pip install --upgrade pip
-    - pip install -r requirements.txt
     - pip install pylint
     - pylint --fail-under=7.0 coffee
   allow_failure: false
@@ -22,10 +37,7 @@ lint:
 # Define the job that runs tests
 test:
   stage: test
-  image: python:3.8
   script:
-    - pip install --upgrade pip
-    - pip install -r requirements.txt
     - python -m pytest
   rules:
     # Only run the job for merge request events
@@ -37,16 +49,13 @@ test:
 # Define the job that builds the Python package
 build:
   stage: build
-  image: python:3.8
   script:
-    - pip install --upgrade pip
     - pip install --upgrade build
-    - pip install -r requirements.txt
     - python -m build
   rules:
     # Only run the job for the main branch
     - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
+
 # Define the job that pushes the code to a public repository such as GitHub
 push:
   stage: deploy
@@ -56,8 +65,9 @@ push:
     - git config --global user.email "alfibalint@gmail.com"
     - git config --global user.name "Balint Alfoldy"
     - git remote set-url origin https://github.com/balintalfoldy/ddc-cicd.git
-    - git push -u origin main
+    - git checkout main
+    - git push origin main
   rules:
     # Only run the job for the main branch
     - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
+
