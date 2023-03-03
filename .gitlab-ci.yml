@@ -14,6 +14,10 @@ lint:
     - pip install pylint
     - pylint --fail-under=7.0 coffee
   allow_failure: false
+  rules:
+    # Only run the job for merge request events
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
 
 # Define the job that runs tests
 test:
@@ -23,7 +27,13 @@ test:
     - pip install --upgrade pip
     - pip install -r requirements.txt
     - python -m pytest
-
+  rules:
+    # Only run the job for merge request events
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    # Only run the job for the main branch
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
 # Define the job that builds the Python package
 build:
   stage: build
@@ -33,15 +43,21 @@ build:
     - pip install --upgrade build
     - pip install -r requirements.txt
     - python -m build
-
+  rules:
+    # Only run the job for the main branch
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
 # Define the job that pushes the code to a public repository such as GitHub
 push:
   stage: deploy
-  image: alpine/git
+  image: alpine:latest
   script:
+    - apk update && apk add git
     - git config --global user.email "alfibalint@gmail.com"
     - git config --global user.name "Balint Alfoldy"
     - git remote set-url --push origin https://github.com/balintalfoldy/ddc-cicd.git
     - git push origin main
-  only:
-    - main
+  rules:
+    # Only run the job for the main branch
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
