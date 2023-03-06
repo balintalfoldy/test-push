@@ -61,8 +61,8 @@ push:
   environment:
     name: production
   rules:
-    # Only run the job for manual triggers on the production branch
-    - if: '$CI_PIPELINE_SOURCE == "manual" && $CI_COMMIT_BRANCH == "production"'
+    # Only run the job for manual triggers on the main
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 # Deploy to Pypi
