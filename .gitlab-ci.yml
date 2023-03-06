@@ -12,15 +12,13 @@ before_script:
   - python -V
   - pip install --upgrade pip
   - pip install virtualenv
-  - virtualenv venv
+  - python -m venv venv
   - source venv/bin/activate
   - pip install -r requirements.txt
 
 stages:
   - lint
   - test
-  - build
-  - deploy
 
 # Define the job that runs pylint and enforces a minimum rating
 lint:
@@ -46,41 +44,5 @@ test:
     # Only run the job for the main branch
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
-# Define the job that builds the Python package
-build:
-  stage: build
-  script:
-    - pip install --upgrade build
-    - python -m build
-  rules:
-    # Only run the job for the main branch
-    - if: '$CI_COMMIT_BRANCH == "main"'
 
-# Define the job that pushes the code to a public repository such as GitHub
-push:
-  stage: deploy
-  image: alpine:latest
-  script:
-    - apk update && apk add git
-    - git config --global user.email "alfibalint@gmail.com"
-    - git config --global user.name "Balint Alfoldy"
-    - git remote set-url origin https://github.com/balintalfoldy/ddc-cicd.git
-    - git checkout main
-    - git push origin main
-  rules:
-    # Only run the job for the main branch
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      # Exclude the before_script section for the push job
-    - when: never
-      changes:
-        - README.md
-        - "*.md"
-        - "docs/**"
-        - "tests/**"
-        - "*.py"
-        - "*.yml"
-        - "*.yaml"
-        - "*.json"
-        - "*.ini"
-        - "*.cfg"
 
