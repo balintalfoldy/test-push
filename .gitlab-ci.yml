@@ -55,14 +55,19 @@ push:
     - apk update && apk add git
     - git config --global user.email "alfibalint@gmail.com"
     - git config --global user.name "Balint Alfoldy"
+    - git clone https://ltk:G5QJQNPY_ZzWpSDLqnUV@gitlab.com/first-tut-group/ddc-cicd.git
+    - cd ddc-cicd
+    - git checkout production
+    - rm .gitignore
+    - git add .
+    - git commit -m "new version"
     - git remote set-url origin https://$GITHUB_USER:$GITHUB_ACCESS_TOKEN@github.com/balintalfoldy/test-push.git
-    - git checkout main
     - git push origin main
   environment:
     name: production
   rules:
     # Only run the job for manual triggers on the main
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_COMMIT_BRANCH == "production"'
 
 
 # Deploy to Pypi
