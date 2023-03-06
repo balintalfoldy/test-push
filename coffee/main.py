@@ -27,7 +27,7 @@ class CoffeeMachine():
 
         self._check_before(coffee)
 
-        print(f'Brewing {recipe}')
+        print(f'Brewing my {recipe}')
         self.counter += 1
         self.coffee_tank -= coffee.get('coffee')
         self.water_tank -= coffee.get('water')

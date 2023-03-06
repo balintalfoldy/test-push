@@ -8,21 +8,20 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
-  - python -V
-  - pip install --upgrade pip
-  - pip install virtualenv
-  - python -m venv venv
-  - source venv/bin/activate
-  - pip install -r requirements.txt
-
 stages:
   - lint
   - test
+  - deploy
 
 # Define the job that runs pylint and enforces a minimum rating
 lint:
   stage: lint
+  before_script:
+    - python -V
+    - pip install --upgrade pip
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
   script:
     - pip install pylint
     - pylint --fail-under=7.0 coffee
@@ -35,14 +34,35 @@ lint:
 # Define the job that runs tests
 test:
   stage: test
+  before_script:
+    - python -V
+    - pip install --upgrade pip
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
   script:
     - python -m pytest
   rules:
     # Only run the job for merge request events
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: always
-    # Only run the job for the main branch
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
 
+# Push to Gitlab
+push:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - apk update && apk add git
+    - git config --global user.email "alfibalint@gmail.com"
+    - git config --global user.name "Balint Alfoldy"
+    - git remote set-url origin https://$GITHUB_USER:$GITHUB_ACCESS_TOKEN@github.com/balintalfoldy/test-push.git
+    - git checkout main
+    - git push origin main
+  rules:
+    # Only run the job for manual triggers on the production branch
+    - if: '$CI_PIPELINE_SOURCE == "manual" && $CI_COMMIT_BRANCH == "production"'
+      when: manual
+
+
+# Deploy to Pypi
 
